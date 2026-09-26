@@ -258,20 +258,11 @@ summary_str = str(model_stats)
 
 ## Markdown and Mermaid export
 
-```python
-summary(model, input_size=(1, 3, 224, 224), markdown_path="model.md")
-```
-
-Export is disabled by default. Supply `input_data` or `input_size` and a string or
-`Path` destination with an existing parent directory. Export runs one fresh forward
-pass, bypasses the cache, and atomically replaces the destination on success.
-Console verbosity and the return value stay unchanged.
-
-The graph shows the executed path of an eager, uncompiled model. Shapes appear on
-arrows; `depth` controls module collapsing. Explicit `col_names` selects table
-columns and adds metrics to module boxes. Totals use existing torchinfo estimates;
-functional-operation MACs are not estimated. No extra dependencies are needed to
-generate reports; viewing requires Mermaid support, with styling varying by viewer.
+Set `markdown_path="model.md"` to export a report; see the examples below.
+Export captures one fresh eager execution, bypasses the forward cache, and
+atomically replaces the destination. Functional-operation MACs are not estimated.
+Generation needs no additional dependencies; displaying diagrams requires a
+Mermaid-capable viewer, and styling support varies by viewer.
 
 ### Layer formatting
 
