@@ -392,20 +392,11 @@ flowchart TD
 
 ## ResNet
 
-`depth=1` keeps each residual stage in one box for a compact report. Increase it
-to show the blocks and their internal residual connections.
-
 ```python
 import torchvision
 
 model = torchvision.models.resnet152()
 summary(model, (1, 3, 224, 224), depth=3)
-
-# Export a compact graph separately from the detailed console summary.
-summary(
-    model, (1, 3, 224, 224), depth=1, verbose=0,
-    col_names=("output_size", "num_params"), markdown_path="resnet152.md",
-)
 ```
 
 ```
@@ -451,52 +442,6 @@ Estimated Total Size (MB): 602.25
 ```
 
 <!-- resnet152.out -->
-
-```mermaid
-%%{init: {"theme": "base", "htmlLabels": false, "flowchart": {"htmlLabels": false, "padding": 24, "rankSpacing": 70, "subGraphTitleMargin": {"top": 12, "bottom": 24}}, "themeVariables": {"fontFamily": "Arial", "fontSize": "14px", "lineColor": "#000000", "textColor": "#000000", "primaryTextColor": "#000000", "titleColor": "#000000", "edgeLabelBackground": "#ffffff"}, "themeCSS": ".flowchart-link {stroke:#000000!important;stroke-width:2.5px!important;}marker path {fill:#000000!important;stroke:#000000!important;}.cluster-label text,.cluster-label span,.cluster-label tspan {fill:#000000!important;color:#000000!important;font-weight:700!important;}.edgeLabel text {fill:#000000!important;}"}}%%
-flowchart TD
-    subgraph g0["ResNet (ResNet)"]
-    direction TB
-    n0{{"Input 1"}}:::input
-    n1[["conv1 (Conv2d)<br/>Param #: 9,408"]]:::convolution
-    n2[/"bn1 (BatchNorm2d)<br/>Param #: 128"/]:::normalization
-    n3("relu (ReLU)<br/>Param #: --"):::activation
-    n4[/"maxpool (MaxPool2d)<br/>Param #: --"\]:::max_pool
-    n5["layer1 (Sequential)<br/>Param #: 215,808"]:::module
-    n6["layer2 (Sequential)<br/>Param #: 2,339,840"]:::module
-    n7["layer3 (Sequential)<br/>Param #: 40,613,888"]:::module
-    n8["layer4 (Sequential)<br/>Param #: 14,964,736"]:::module
-    n9[("avgpool (AdaptiveAvgPool2d)<br/>Param #: --")]:::avg_pool
-    n10("aten.view.default"):::operation
-    n11["fc (Linear)<br/>Param #: 2,049,000"]:::linear
-    n12(["Output 1"]):::output
-    end
-    n0 -->|"[1, 3, 224, 224]"| n1
-    n1 -->|"[1, 64, 112, 112]"| n2
-    n2 -->|"[1, 64, 112, 112]"| n3
-    n3 -->|"[1, 64, 112, 112]"| n4
-    n4 -->|"[1, 64, 56, 56]"| n5
-    n5 -->|"[1, 256, 56, 56]"| n6
-    n6 -->|"[1, 512, 28, 28]"| n7
-    n7 -->|"[1, 1024, 14, 14]"| n8
-    n8 -->|"[1, 2048, 7, 7]"| n9
-    n9 -->|"[1, 2048, 1, 1]"| n10
-    n10 -->|"[1, 2048]"| n11
-    n11 -->|"[1, 1000]"| n12
-    style g0 fill:#ffffff,stroke:#64748b,stroke-width:2px,color:#000000
-    linkStyle default stroke:#000000,stroke-width:2.5px,color:#000000
-    classDef activation fill:#ffedd5,stroke:#c2410c,stroke-width:2px,color:#000000
-    classDef avg_pool fill:#ccfbf1,stroke:#0f766e,stroke-width:2px,color:#000000
-    classDef convolution fill:#dbeafe,stroke:#1e40af,stroke-width:2px,color:#000000
-    classDef input fill:#dbeafe,stroke:#1d4ed8,stroke-width:2px,color:#000000
-    classDef linear fill:#dcfce7,stroke:#166534,stroke-width:2px,color:#000000
-    classDef max_pool fill:#cffafe,stroke:#0e7490,stroke-width:2px,color:#000000
-    classDef module fill:#f1f5f9,stroke:#475569,stroke-width:2px,color:#000000
-    classDef normalization fill:#ede9fe,stroke:#6d28d9,stroke-width:2px,color:#000000
-    classDef operation fill:#fef3c7,stroke:#92400e,stroke-width:2px,color:#000000
-    classDef output fill:#dcfce7,stroke:#15803d,stroke-width:2px,color:#000000
-```
-
 
 ## Multiple Inputs w/ Different Data Types
 
