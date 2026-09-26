@@ -38,7 +38,7 @@ from torchinfo import summary
 
 model = ConvNet()
 batch_size = 16
-summary(model, input_size=(batch_size, 1, 28, 28))
+summary(model, input_size=(batch_size, 1, 28, 28), markdown_path="model.md")
 ```
 
 ```
@@ -228,6 +228,10 @@ Args:
             Default: 1
             If using a Juypter Notebook or Google Colab, the default is 0.
 
+    markdown_path (str or PathLike):
+            Optional Markdown report destination. Requires input_data or input_size
+            and an existing parent directory. Default: None (disabled).
+
     **kwargs:
             Other arguments used in `model.forward` function. Passing *args is no
             longer supported.
@@ -245,7 +249,9 @@ Return:
 ```python
 from torchinfo import summary
 
-model_stats = summary(your_model, (1, 3, 28, 28), verbose=0)
+model_stats = summary(
+    your_model, (1, 3, 28, 28), verbose=0, markdown_path="model.md",
+)
 summary_str = str(model_stats)
 # summary_str contains the string representation of the summary!
 ```
@@ -266,7 +272,6 @@ arrows; `depth` controls module collapsing. Explicit `col_names` selects table
 columns and adds metrics to module boxes. Totals use existing torchinfo estimates;
 functional-operation MACs are not estimated. No extra dependencies are needed to
 generate reports; viewing requires Mermaid support, with styling varying by viewer.
-See the [ResNet18 report](examples/resnet18.md).
 
 ### Layer formatting
 
@@ -323,6 +328,7 @@ summary(
     col_width=16,
     col_names=["kernel_size", "output_size", "num_params", "mult_adds"],
     row_settings=["var_names"],
+    markdown_path="lstm.md",
 )
 ```
 
@@ -361,13 +367,54 @@ Estimated Total Size (MB): 15.80
 
 <!-- lstm.out -->
 
+```mermaid
+%%{init: {"theme": "base", "htmlLabels": false, "flowchart": {"htmlLabels": false, "padding": 24, "rankSpacing": 70, "subGraphTitleMargin": {"top": 12, "bottom": 24}}, "themeVariables": {"fontFamily": "Arial", "fontSize": "14px", "lineColor": "#000000", "textColor": "#000000", "primaryTextColor": "#000000", "titleColor": "#000000", "edgeLabelBackground": "#ffffff"}, "themeCSS": ".flowchart-link {stroke:#000000!important;stroke-width:2.5px!important;}marker path {fill:#000000!important;stroke:#000000!important;}.cluster-label text,.cluster-label span,.cluster-label tspan {fill:#000000!important;color:#000000!important;font-weight:700!important;}.edgeLabel text {fill:#000000!important;}"}}%%
+flowchart TD
+    subgraph g0["LSTMNet (LSTMNet)"]
+    direction TB
+    n0{{"Input 1"}}:::input
+    n1[("embedding (Embedding)<br/>Kernel Shape: --<br/>Param #: 6,000<br/>Mult-Adds: 6,000")]:::embedding
+    n2[["encoder (LSTM)<br/>Kernel Shape: --<br/>Param #: 3,768,320<br/>Mult-Adds: 376,832,000"]]:::recurrent
+    n3["decoder (Linear)<br/>Kernel Shape: --<br/>Param #: 10,260<br/>Mult-Adds: 1,026,000"]:::linear
+    n4("aten.view.default"):::operation
+    n5(["Output 1"]):::output
+    n6(["Output 2"]):::output
+    n7(["Output 3"]):::output
+    end
+    n0 -->|"[1, 100]"| n1
+    n1 -->|"[1, 100, 300]"| n2
+    n2 -->|"[1, 100, 512]"| n3
+    n3 -->|"[1, 100, 20]"| n4
+    n4 -->|"[100, 20]"| n5
+    n2 -->|"[2, 1, 512]"| n6
+    n2 -->|"[2, 1, 512]"| n7
+    style g0 fill:#ffffff,stroke:#64748b,stroke-width:2px,color:#000000
+    linkStyle default stroke:#000000,stroke-width:2.5px,color:#000000
+    classDef embedding fill:#fae8ff,stroke:#a21caf,stroke-width:2px,color:#000000
+    classDef input fill:#dbeafe,stroke:#1d4ed8,stroke-width:2px,color:#000000
+    classDef linear fill:#dcfce7,stroke:#166534,stroke-width:2px,color:#000000
+    classDef operation fill:#fef3c7,stroke:#92400e,stroke-width:2px,color:#000000
+    classDef output fill:#dcfce7,stroke:#15803d,stroke-width:2px,color:#000000
+    classDef recurrent fill:#e0e7ff,stroke:#4338ca,stroke-width:2px,color:#000000
+```
+
+
 ## ResNet
+
+`depth=1` keeps each residual stage in one box for a compact report. Increase it
+to show the blocks and their internal residual connections.
 
 ```python
 import torchvision
 
 model = torchvision.models.resnet152()
 summary(model, (1, 3, 224, 224), depth=3)
+
+# Export a compact graph separately from the detailed console summary.
+summary(
+    model, (1, 3, 224, 224), depth=1, verbose=0,
+    col_names=("output_size", "num_params"), markdown_path="resnet152.md",
+)
 ```
 
 ```
@@ -414,6 +461,52 @@ Estimated Total Size (MB): 602.25
 
 <!-- resnet152.out -->
 
+```mermaid
+%%{init: {"theme": "base", "htmlLabels": false, "flowchart": {"htmlLabels": false, "padding": 24, "rankSpacing": 70, "subGraphTitleMargin": {"top": 12, "bottom": 24}}, "themeVariables": {"fontFamily": "Arial", "fontSize": "14px", "lineColor": "#000000", "textColor": "#000000", "primaryTextColor": "#000000", "titleColor": "#000000", "edgeLabelBackground": "#ffffff"}, "themeCSS": ".flowchart-link {stroke:#000000!important;stroke-width:2.5px!important;}marker path {fill:#000000!important;stroke:#000000!important;}.cluster-label text,.cluster-label span,.cluster-label tspan {fill:#000000!important;color:#000000!important;font-weight:700!important;}.edgeLabel text {fill:#000000!important;}"}}%%
+flowchart TD
+    subgraph g0["ResNet (ResNet)"]
+    direction TB
+    n0{{"Input 1"}}:::input
+    n1[["conv1 (Conv2d)<br/>Param #: 9,408"]]:::convolution
+    n2[/"bn1 (BatchNorm2d)<br/>Param #: 128"/]:::normalization
+    n3("relu (ReLU)<br/>Param #: --"):::activation
+    n4[/"maxpool (MaxPool2d)<br/>Param #: --"\]:::max_pool
+    n5["layer1 (Sequential)<br/>Param #: 215,808"]:::module
+    n6["layer2 (Sequential)<br/>Param #: 2,339,840"]:::module
+    n7["layer3 (Sequential)<br/>Param #: 40,613,888"]:::module
+    n8["layer4 (Sequential)<br/>Param #: 14,964,736"]:::module
+    n9[("avgpool (AdaptiveAvgPool2d)<br/>Param #: --")]:::avg_pool
+    n10("aten.view.default"):::operation
+    n11["fc (Linear)<br/>Param #: 2,049,000"]:::linear
+    n12(["Output 1"]):::output
+    end
+    n0 -->|"[1, 3, 224, 224]"| n1
+    n1 -->|"[1, 64, 112, 112]"| n2
+    n2 -->|"[1, 64, 112, 112]"| n3
+    n3 -->|"[1, 64, 112, 112]"| n4
+    n4 -->|"[1, 64, 56, 56]"| n5
+    n5 -->|"[1, 256, 56, 56]"| n6
+    n6 -->|"[1, 512, 28, 28]"| n7
+    n7 -->|"[1, 1024, 14, 14]"| n8
+    n8 -->|"[1, 2048, 7, 7]"| n9
+    n9 -->|"[1, 2048, 1, 1]"| n10
+    n10 -->|"[1, 2048]"| n11
+    n11 -->|"[1, 1000]"| n12
+    style g0 fill:#ffffff,stroke:#64748b,stroke-width:2px,color:#000000
+    linkStyle default stroke:#000000,stroke-width:2.5px,color:#000000
+    classDef activation fill:#ffedd5,stroke:#c2410c,stroke-width:2px,color:#000000
+    classDef avg_pool fill:#ccfbf1,stroke:#0f766e,stroke-width:2px,color:#000000
+    classDef convolution fill:#dbeafe,stroke:#1e40af,stroke-width:2px,color:#000000
+    classDef input fill:#dbeafe,stroke:#1d4ed8,stroke-width:2px,color:#000000
+    classDef linear fill:#dcfce7,stroke:#166534,stroke-width:2px,color:#000000
+    classDef max_pool fill:#cffafe,stroke:#0e7490,stroke-width:2px,color:#000000
+    classDef module fill:#f1f5f9,stroke:#475569,stroke-width:2px,color:#000000
+    classDef normalization fill:#ede9fe,stroke:#6d28d9,stroke-width:2px,color:#000000
+    classDef operation fill:#fef3c7,stroke:#92400e,stroke-width:2px,color:#000000
+    classDef output fill:#dcfce7,stroke:#15803d,stroke-width:2px,color:#000000
+```
+
+
 ## Multiple Inputs w/ Different Data Types
 
 ```python
@@ -436,7 +529,11 @@ class MultipleInputNetDifferentDtypes(nn.Module):
         return F.log_softmax(x, dim=1)
 
 
-summary(model, [(1, 300), (1, 300)], dtypes=[torch.float, torch.long])
+model = MultipleInputNetDifferentDtypes()
+summary(
+    model, [(1, 300), (1, 300)], dtypes=[torch.float, torch.long],
+    markdown_path="multiple_inputs.md",
+)
 ```
 
 Alternatively, you can also pass in the input_data itself, and
@@ -447,7 +544,47 @@ input_data = torch.randn(1, 300)
 other_input_data = torch.randn(1, 300).long()
 model = MultipleInputNetDifferentDtypes()
 
-summary(model, input_data=[input_data, other_input_data, ...])
+summary(
+    model, input_data=[input_data, other_input_data],
+    markdown_path="multiple_inputs.md",
+)
+```
+
+```mermaid
+%%{init: {"theme": "base", "htmlLabels": false, "flowchart": {"htmlLabels": false, "padding": 24, "rankSpacing": 70, "subGraphTitleMargin": {"top": 12, "bottom": 24}}, "themeVariables": {"fontFamily": "Arial", "fontSize": "14px", "lineColor": "#000000", "textColor": "#000000", "primaryTextColor": "#000000", "titleColor": "#000000", "edgeLabelBackground": "#ffffff"}, "themeCSS": ".flowchart-link {stroke:#000000!important;stroke-width:2.5px!important;}marker path {fill:#000000!important;stroke:#000000!important;}.cluster-label text,.cluster-label span,.cluster-label tspan {fill:#000000!important;color:#000000!important;font-weight:700!important;}.edgeLabel text {fill:#000000!important;}"}}%%
+flowchart TD
+    subgraph g0["MultipleInputNetDifferentDtypes (MultipleInputNetDifferentDtypes)"]
+    direction TB
+    n0{{"Input 1"}}:::input
+    n1{{"Input 2"}}:::input
+    n2["fc1a (Linear)"]:::linear
+    n3("aten.relu.default"):::operation
+    n4["fc1b (Linear)"]:::linear
+    n5("aten._to_copy.default"):::operation
+    n6["fc2a (Linear)"]:::linear
+    n7("aten.relu.default"):::operation
+    n8["fc2b (Linear)"]:::linear
+    n9("aten.cat.default"):::operation
+    n10("aten._log_softmax.default"):::operation
+    n11(["Output 1"]):::output
+    end
+    n0 -->|"[1, 300]"| n2
+    n2 -->|"[1, 50]"| n3
+    n3 -->|"[1, 50]"| n4
+    n1 -->|"[1, 300]"| n5
+    n5 -->|"[1, 300]"| n6
+    n6 -->|"[1, 50]"| n7
+    n7 -->|"[1, 50]"| n8
+    n4 -->|"[1, 10]"| n9
+    n8 -->|"[1, 10]"| n9
+    n9 -->|"[2, 10]"| n10
+    n10 -->|"[2, 10]"| n11
+    style g0 fill:#ffffff,stroke:#64748b,stroke-width:2px,color:#000000
+    linkStyle default stroke:#000000,stroke-width:2.5px,color:#000000
+    classDef input fill:#dbeafe,stroke:#1d4ed8,stroke-width:2px,color:#000000
+    classDef linear fill:#dcfce7,stroke:#166534,stroke-width:2px,color:#000000
+    classDef operation fill:#fef3c7,stroke:#92400e,stroke-width:2px,color:#000000
+    classDef output fill:#dcfce7,stroke:#15803d,stroke-width:2px,color:#000000
 ```
 
 ## Sequentials & ModuleLists
@@ -485,7 +622,7 @@ class ContainerChildModule(nn.Module):
         return out
 
 
-summary(ContainerModule(), (1, 5))
+summary(ContainerModule(), (1, 5), markdown_path="containers.md")
 ```
 
 ```
@@ -523,6 +660,46 @@ Estimated Total Size (MB): 0.00
 ```
 
 <!-- container.out -->
+
+```mermaid
+%%{init: {"theme": "base", "htmlLabels": false, "flowchart": {"htmlLabels": false, "padding": 24, "rankSpacing": 70, "subGraphTitleMargin": {"top": 12, "bottom": 24}}, "themeVariables": {"fontFamily": "Arial", "fontSize": "14px", "lineColor": "#000000", "textColor": "#000000", "primaryTextColor": "#000000", "titleColor": "#000000", "edgeLabelBackground": "#ffffff"}, "themeCSS": ".flowchart-link {stroke:#000000!important;stroke-width:2.5px!important;}marker path {fill:#000000!important;stroke:#000000!important;}.cluster-label text,.cluster-label span,.cluster-label tspan {fill:#000000!important;color:#000000!important;font-weight:700!important;}.edgeLabel text {fill:#000000!important;}"}}%%
+flowchart TD
+    subgraph g0["ContainerModule (ContainerModule)"]
+    direction TB
+    n0{{"Input 1"}}:::input
+    n1["0 (Linear)"]:::linear
+    subgraph g1["1 (ContainerChildModule)"]
+    direction TB
+    n2["_sequential (Sequential)"]:::module
+    n3["_between (Linear)"]:::linear
+    n4["0 (Linear)"]:::linear
+    n5["1 (Linear)"]:::linear
+    n6["_sequential (Sequential)"]:::module
+    n7["0 (Linear)"]:::linear
+    n8["1 (Linear)"]:::linear
+    end
+    n9["2 (Linear)"]:::linear
+    n10(["Output 1"]):::output
+    end
+    n0 -->|"[1, 5]"| n1
+    n1 -->|"[1, 5]"| n2
+    n2 -->|"[1, 5]"| n3
+    n3 -->|"[1, 5]"| n4
+    n4 -->|"[1, 5]"| n5
+    n1 -->|"[1, 5]"| n6
+    n6 -->|"[1, 5]"| n7
+    n7 -->|"[1, 5]"| n8
+    n8 -->|"[1, 5]"| n9
+    n9 -->|"[1, 5]"| n10
+    style g0 fill:#ffffff,stroke:#64748b,stroke-width:2px,color:#000000
+    style g1 fill:none,stroke:#60a5fa,stroke-width:2px,color:#000000
+    linkStyle default stroke:#000000,stroke-width:2.5px,color:#000000
+    classDef input fill:#dbeafe,stroke:#1d4ed8,stroke-width:2px,color:#000000
+    classDef linear fill:#dcfce7,stroke:#166534,stroke-width:2px,color:#000000
+    classDef module fill:#f1f5f9,stroke:#475569,stroke-width:2px,color:#000000
+    classDef output fill:#dcfce7,stroke:#15803d,stroke-width:2px,color:#000000
+```
+
 
 # Contributing
 
