@@ -398,15 +398,6 @@ def render_markdown(
                 "Layer shapes and colors follow the bundled layer_styles.json registry."
             ),
             "",
-            "### Layer style legend",
-            "",
-            "| Layer family | Shape |",
-            "| --- | --- |",
-            *(
-                f"| {escape(styles[name]['label'])} | {styles[name]['shape']} |"
-                for name in sorted(used_styles)
-            ),
-            "",
             "## Layer statistics",
             "",
             "| Layer | " + " | ".join(HEADER_TITLES[c] for c in columns) + " |",

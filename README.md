@@ -277,14 +277,13 @@ base-class lookup and a `default` fallback. Merge entries like these into the fi
     "convolution": {
       "shape": "subroutine",
       "fill": "#dbeafe",
-      "stroke": "#1e40af",
-      "label": "Convolution"
+      "stroke": "#1e40af"
     }
   }
 }
 ```
 
-`fill` sets the background, `stroke` the border, and `label` the legend text.
+`fill` sets the background and `stroke` sets the border.
 Supported shapes: `rectangle`, `rounded`, `subroutine` (double rectangle),
 `parallelogram`, `trapezoid`, `cylinder`, `hexagon`, and `stadium`.
 Use light backgrounds for black text. Preserve `default` and the `input`, `output`,

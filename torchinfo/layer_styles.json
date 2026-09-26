@@ -48,86 +48,72 @@
     "input": {
       "shape": "hexagon",
       "fill": "#dbeafe",
-      "stroke": "#1d4ed8",
-      "label": "Input"
+      "stroke": "#1d4ed8"
     },
     "output": {
       "shape": "stadium",
       "fill": "#dcfce7",
-      "stroke": "#15803d",
-      "label": "Output"
+      "stroke": "#15803d"
     },
     "operation": {
       "shape": "rounded",
       "fill": "#fef3c7",
-      "stroke": "#92400e",
-      "label": "Functional operation"
+      "stroke": "#92400e"
     },
     "module": {
       "shape": "rectangle",
       "fill": "#f1f5f9",
-      "stroke": "#475569",
-      "label": "Other module"
+      "stroke": "#475569"
     },
     "convolution": {
       "shape": "subroutine",
       "fill": "#dbeafe",
-      "stroke": "#1e40af",
-      "label": "Convolution"
+      "stroke": "#1e40af"
     },
     "normalization": {
       "shape": "parallelogram",
       "fill": "#ede9fe",
-      "stroke": "#6d28d9",
-      "label": "Normalization"
+      "stroke": "#6d28d9"
     },
     "activation": {
       "shape": "rounded",
       "fill": "#ffedd5",
-      "stroke": "#c2410c",
-      "label": "Activation"
+      "stroke": "#c2410c"
     },
     "max_pool": {
       "shape": "trapezoid",
       "fill": "#cffafe",
-      "stroke": "#0e7490",
-      "label": "Max pooling"
+      "stroke": "#0e7490"
     },
     "avg_pool": {
       "shape": "cylinder",
       "fill": "#ccfbf1",
-      "stroke": "#0f766e",
-      "label": "Average pooling"
+      "stroke": "#0f766e"
     },
     "linear": {
       "shape": "rectangle",
       "fill": "#dcfce7",
-      "stroke": "#166534",
-      "label": "Linear"
+      "stroke": "#166534"
     },
     "dropout": {
       "shape": "hexagon",
       "fill": "#ffe4e6",
-      "stroke": "#be123c",
-      "label": "Dropout"
+      "stroke": "#be123c"
     },
     "reshape": {
       "shape": "parallelogram",
       "fill": "#fef9c3",
-      "stroke": "#854d0e",
-      "label": "Reshape"
+      "stroke": "#854d0e"
     },
     "embedding": {
       "shape": "cylinder",
       "fill": "#fae8ff",
-      "stroke": "#a21caf",
-      "label": "Embedding"
+      "stroke": "#a21caf"
     },
     "recurrent": {
       "shape": "subroutine",
       "fill": "#e0e7ff",
-      "stroke": "#4338ca",
-      "label": "Recurrent"
+      "stroke": "#4338ca"
     }
   }
 }
