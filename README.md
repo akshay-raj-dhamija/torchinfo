@@ -109,6 +109,8 @@ def summary(
     mode: str = "same",
     row_settings: Iterable[str] | None = None,
     verbose: int | None = None,
+    *,
+    markdown_path: str | os.PathLike[str] | None = None,
     **kwargs: Any,
 ) -> ModelStatistics:
 """
@@ -247,6 +249,50 @@ model_stats = summary(your_model, (1, 3, 28, 28), verbose=0)
 summary_str = str(model_stats)
 # summary_str contains the string representation of the summary!
 ```
+
+## Markdown and Mermaid export
+
+```python
+summary(model, input_size=(1, 3, 224, 224), markdown_path="model.md")
+```
+
+Export is disabled by default. Supply `input_data` or `input_size` and a string or
+`Path` destination with an existing parent directory. Export runs one fresh forward
+pass, bypasses the cache, and atomically replaces the destination on success.
+Console verbosity and the return value stay unchanged.
+
+The graph shows the executed path of an eager, uncompiled model. Shapes appear on
+arrows; `depth` controls module collapsing. Explicit `col_names` selects table
+columns and adds metrics to module boxes. Totals use existing torchinfo estimates;
+functional-operation MACs are not estimated. No extra dependencies are needed to
+generate reports; viewing requires Mermaid support, with styling varying by viewer.
+See the [ResNet18 report](examples/resnet18.md).
+
+### Layer formatting
+
+Edit the bundled [`torchinfo/layer_styles.json`](torchinfo/layer_styles.json) and
+regenerate the report. `types` maps case-sensitive class names to `styles`, with
+base-class lookup and a `default` fallback. Merge entries like these into the file:
+
+```json
+{
+  "types": {"Conv2d": "convolution"},
+  "styles": {
+    "convolution": {
+      "shape": "subroutine",
+      "fill": "#dbeafe",
+      "stroke": "#1e40af",
+      "label": "Convolution"
+    }
+  }
+}
+```
+
+`fill` sets the background, `stroke` the border, and `label` the legend text.
+Supported shapes: `rectangle`, `rounded`, `subroutine` (double rectangle),
+`parallelogram`, `trapezoid`, `cylinder`, `hexagon`, and `stadium`.
+Use light backgrounds for black text. Preserve `default` and the `input`, `output`,
+and `operation` styles; every mapped style must exist in `styles`.
 
 ## Explore Different Configurations
 
